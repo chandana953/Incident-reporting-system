@@ -59,4 +59,8 @@ router.put(
 // Delete incident
 router.delete('/:id', incidentController.deleteIncident);
 
+// Verification & Flagging
+router.post('/:id/verify', incidentController.verifyIncident);
+router.post('/:id/flag', incidentController.flagIncident);
+
 module.exports = router;

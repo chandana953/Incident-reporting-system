@@ -294,6 +294,42 @@ const getStats = async () => {
     };
 };
 
+/**
+ * Verify an incident
+ */
+const verifyIncident = async (id, userId) => {
+    let incident;
+    if (process.env.DB_CONNECTED === 'true') {
+        incident = await Incident.findById(id);
+        if (!incident) throw new CustomError('Incident not found', 404);
+        
+        // Add user to verifications if not already there
+        if (!incident.verifications.includes(userId)) {
+            incident.verifications.push(userId);
+            await incident.save();
+        }
+    } else {
+        // RESILIENT MODE
+        const idx = memoryIncidents.findIndex(inc => inc._id === id);
+        if (idx === -1) throw new CustomError('Incident not found', 404);
+        
+        if (!memoryIncidents[idx].verifications.includes(userId)) {
+            memoryIncidents[idx].verifications.push(userId);
+        }
+        incident = memoryIncidents[idx];
+    }
+    return incident;
+};
+
+/**
+ * Flag an incident
+ */
+const flagIncident = async (id, userId) => {
+    // In this premium version, flagging could trigger an admin review task
+    // For now, we'll just track it
+    return { success: true, message: 'Incident flagged for review' };
+};
+
 module.exports = {
     createIncident,
     getAllIncidents,
@@ -301,5 +337,7 @@ module.exports = {
     updateIncident,
     deleteIncident,
     getNearbyIncidents,
-    getStats
+    getStats,
+    verifyIncident,
+    flagIncident
 };

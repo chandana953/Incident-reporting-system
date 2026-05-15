@@ -93,3 +93,21 @@ exports.getStats = async (req, res, next) => {
         return next(error);
     }
 };
+
+exports.verifyIncident = async (req, res, next) => {
+    try {
+        const incident = await incidentService.verifyIncident(req.params.id, req.user._id);
+        return sendResponse(res, 200, 'Incident verified successfully', incident);
+    } catch (error) {
+        return next(error);
+    }
+};
+
+exports.flagIncident = async (req, res, next) => {
+    try {
+        const incident = await incidentService.flagIncident(req.params.id, req.user._id);
+        return sendResponse(res, 200, 'Incident flagged successfully', incident);
+    } catch (error) {
+        return next(error);
+    }
+};
