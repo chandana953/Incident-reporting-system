@@ -197,25 +197,43 @@
   @media (max-width: 1200px) {
     .feed-container {
       grid-template-columns: 80px 1fr 300px;
+      gap: 1.5rem;
+      padding: 1.5rem;
     }
   }
 
   @media (max-width: 1024px) {
     .feed-container {
       grid-template-columns: 80px 1fr;
+      gap: 1rem;
+      padding: 1rem;
     }
     .right-sidebar {
       display: none;
     }
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .feed-container {
       grid-template-columns: 1fr;
-      padding: 1rem;
+      padding: 1rem 1rem 5rem 1rem; /* Extra bottom padding for MobileNav */
     }
     .left-sidebar {
       display: none;
+    }
+    
+    .heading-xl {
+      font-size: 1.75rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .feed-container {
+      padding: 0.75rem 0.75rem 6rem 0.75rem;
+    }
+    
+    .glass-card {
+      padding: 1rem !important;
     }
   }
 

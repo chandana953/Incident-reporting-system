@@ -63,7 +63,7 @@ const IncidentCard = ({ incident, onVerify, onFlag }) => {
   return (
     <div className={`glass-card p-0 overflow-hidden mb-6 group transition-all duration-500 hover:scale-[1.01] ${priority === 'critical' ? 'border-danger/30 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : ''}`}>
       {/* Header */}
-      <div className="p-4 flex items-center justify-between">
+      <div className="p-4 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center overflow-hidden">
             {reportedBy?.avatarUrl ? (
