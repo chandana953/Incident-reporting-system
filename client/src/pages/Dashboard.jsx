@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { getIncidents } from '../services/incidentService';
@@ -18,6 +19,7 @@ import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { connected, on, off } = useSocket();
   const [incidents, setIncidents] = useState([]);
   const [stats, setStats] = useState({ total: 0, open: 0, resolved: 0, critical: 0 });
@@ -143,7 +145,10 @@ const Dashboard = () => {
             </div>
             <h2 className="text-xl font-bold mb-2">City Status Stable</h2>
             <p className="text-muted text-sm mb-8">No incidents reported nearby. The community monitoring is active.</p>
-            <button className="btn-primary">
+            <button 
+              className="btn-primary"
+              onClick={() => navigate('/incidents/create')}
+            >
               <Plus size={18} /> REPORT AN INCIDENT
             </button>
           </div>
