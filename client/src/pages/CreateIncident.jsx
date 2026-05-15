@@ -172,7 +172,7 @@ const CreateIncident = () => {
               {/* Title & Description */}
               <div className="space-y-4">
                 <div>
-                  <label className="form-label">Incident Title</label>
+                  <label className="form-label">Incident Title:</label>
                   <input 
                     className="form-input" 
                     name="title" 
@@ -183,7 +183,7 @@ const CreateIncident = () => {
                   />
                 </div>
                 <div>
-                  <label className="form-label">Detailed Description</label>
+                  <label className="form-label">Detailed Description:</label>
                   <textarea 
                     className="form-input" 
                     name="description" 
@@ -211,7 +211,7 @@ const CreateIncident = () => {
               {/* Priority & Location */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <label className="form-label">Urgency Level</label>
+                  <label className="form-label">Urgency Level:</label>
                   <div className="grid grid-cols-2 gap-2">
                     {PRIORITIES.map((p) => (
                       <button
@@ -242,7 +242,7 @@ const CreateIncident = () => {
 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <label className="form-label mb-0">Location Tracking</label>
+                    <label className="form-label mb-0">Location Tracking:</label>
                     <button 
                       type="button" 
                       onClick={useMyLocation}
@@ -285,7 +285,7 @@ const CreateIncident = () => {
 
               {/* Image Preview */}
               <div className="space-y-2">
-                <label className="form-label">Visual Evidence (Optional)</label>
+                <label className="form-label">Visual Evidence (Optional):</label>
                 {preview ? (
                   <div className="relative rounded-2xl overflow-hidden border border-white/10 group">
                     <img src={preview} alt="Preview" className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" />
