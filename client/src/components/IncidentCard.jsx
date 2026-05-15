@@ -101,7 +101,7 @@ const IncidentCard = ({ incident, onVerify, onFlag }) => {
 
       {/* Content */}
       <Link to={`/incidents/${_id}`} className="block px-4 pb-2">
-        <h3 className="font-bold text-lg mb-2 group-hover:text-accent transition-colors">{title}</h3>
+        <h3 className="font-bold text-lg mb-2 group-hover:text-accent transition-colors">{title}:</h3>
         <p className="text-muted text-sm line-clamp-2 leading-relaxed mb-4">
           {description}
         </p>

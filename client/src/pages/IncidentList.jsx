@@ -126,7 +126,7 @@ const IncidentList = () => {
               <div key={inc._id} className="incident-row">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: '0.25rem', fontSize: '0.95rem' }}>{inc.title}</p>
+                    <p style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: '0.25rem', fontSize: '0.95rem' }}>{inc.title}:</p>
                     <p style={{ color: '#64748b', fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inc.description}</p>
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '0.4rem', color: '#475569', fontSize: '0.75rem', flexWrap: 'wrap' }}>
                       <span>📁 {inc.category}</span>

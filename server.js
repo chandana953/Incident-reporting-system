@@ -61,6 +61,7 @@ app.use(loggerMiddleware);
 app.use('/api/auth', authRoutes);
 app.use('/auth', authRoutes); // Fallback for proxy stripping /api
 app.use('/api/incidents', incidentRoutes);
+app.use('/incidents', incidentRoutes); // Fallback for proxy stripping /api
 
 // Base route
 app.get('/', (req, res) => {

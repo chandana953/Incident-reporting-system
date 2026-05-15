@@ -151,7 +151,7 @@ const IncidentDetails = () => {
             </div>
 
             <div className="p-8">
-              <h1 className="text-4xl font-black mb-6 leading-tight tracking-tight">{title}</h1>
+              <h1 className="text-4xl font-black mb-6 leading-tight tracking-tight">{title}:</h1>
               <p className="text-muted/90 leading-relaxed text-lg mb-8 font-medium">
                 {description}
               </p>
