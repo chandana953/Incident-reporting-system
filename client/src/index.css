@@ -1,0 +1,292 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Cyber Emergency Network Palette */
+    --color-bg-primary: #0B1120;
+    --color-bg-secondary: #0F172A;
+    --color-bg-card: #111827;
+    --color-accent: #3B82F6; /* Electric Blue */
+    --color-accent-secondary: #06B6D4; /* Neon Cyan */
+    --color-accent-glow: rgba(59, 130, 246, 0.3);
+    --color-cyan-glow: rgba(6, 182, 212, 0.3);
+    
+    --color-success: #22C55E;
+    --color-warning: #F97316;
+    --color-danger: #EF4444;
+    --color-critical: #EF4444;
+    
+    --color-text-primary: #F8FAFC;
+    --color-text-muted: #94A3B8;
+    --color-border: rgba(59, 130, 246, 0.15);
+    --glass-bg: rgba(17, 24, 39, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-primary);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 10px;
+  }
+}
+
+@layer components {
+  /* ── Futuristic Glass Card ──────────────────────── */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glass-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 15px 50px -12px rgba(0, 0, 0, 0.6);
+  }
+
+  /* ── Cyber Button ───────────────────────────────── */
+  .btn-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.75rem;
+    background: linear-gradient(135deg, var(--color-accent), #2563EB);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 0.75rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    box-shadow: 0 0 20px var(--color-accent-glow);
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    transition: 0.5s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px var(--color-accent-glow);
+  }
+  .btn-primary:hover::after {
+    left: 100%;
+  }
+
+  .btn-secondary {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--color-accent);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+  .btn-secondary:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: var(--color-accent);
+  }
+
+  /* ── Neon Glow Border ───────────────────────────── */
+  .glow-border {
+    position: relative;
+    border: 1px solid var(--color-border);
+  }
+  .glow-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(45deg, var(--color-accent), var(--color-accent-secondary), var(--color-accent));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+  .glow-border:hover::before {
+    opacity: 1;
+  }
+
+  /* ── Status Badges ──────────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .badge-critical { background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+  .badge-high     { background: rgba(249, 115, 22, 0.1); color: #F97316; border: 1px solid rgba(249, 115, 22, 0.2); }
+  .badge-medium   { background: rgba(59, 130, 246, 0.1); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.2); }
+  .badge-low      { background: rgba(34, 197, 94, 0.1); color: #22C55E; border: 1px solid rgba(34, 197, 94, 0.2); }
+
+  .badge-verified { background: rgba(34, 197, 94, 0.15); color: #22C55E; border: 1px solid rgba(34, 197, 94, 0.3); }
+
+  /* ── Pulse Animation ────────────────────────────── */
+  .pulse-live {
+    position: relative;
+  }
+  .pulse-live::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #EF4444;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  }
+
+  /* ── Layout Utilities ───────────────────────────── */
+  .feed-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 1200px) {
+    .feed-container {
+      grid-template-columns: 80px 1fr 300px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .feed-container {
+      grid-template-columns: 80px 1fr;
+    }
+    .right-sidebar {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .feed-container {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+    }
+    .left-sidebar {
+      display: none;
+    }
+  }
+
+  /* ── Typography ─────────────────────────────────── */
+  .heading-xl {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    background: linear-gradient(135deg, #F8FAFC 0%, #CBD5E1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+
+  /* Emergency Animations */
+  @keyframes dash {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.7); }
+  }
+
+  @keyframes pulse-cyan {
+    0%, 100% { box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.7); }
+  }
+
+  .animate-dash {
+    stroke-dasharray: 5;
+    animation: dash 3s linear infinite;
+  }
+
+  .emergency-pulse {
+    animation: pulse-red 2s infinite;
+  }
+
+  .tracking-pulse {
+    animation: pulse-cyan 2s infinite;
+  }
+
+  /* Cyber Tracking Panel */
+  .cyber-panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border-left: 3px solid var(--color-accent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cyber-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-accent) 0%, transparent 100%);
+    opacity: 0.5;
+  }
+
+  .cyber-grid-bg {
+    background-image: radial-gradient(var(--color-accent) 0.5px, transparent 0.5px);
+    background-size: 20px 20px;
+    opacity: 0.05;
+  }
+}
