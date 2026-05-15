@@ -13,7 +13,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'incidents',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     },
 });
 
