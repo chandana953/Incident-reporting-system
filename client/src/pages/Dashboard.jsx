@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { getIncidents } from '../services/incidentService';
+import { getIncidents, verifyIncident, deleteIncident } from '../services/incidentService';
 import { LoadingSpinner } from '../components/UI';
 import IncidentCard from '../components/IncidentCard';
 import { 
@@ -64,14 +64,38 @@ const Dashboard = () => {
     return () => off('newIncident', handleNew);
   }, [on, off]);
 
-  const handleVerify = (id) => {
-    // In a real app, this would call an API
-    toast.success('Incident verification submitted to the network', {
-      icon: '🛡️'
-    });
-    setIncidents(prev => prev.map(inc => 
-      inc._id === id ? { ...inc, verifications: [...(inc.verifications || []), user._id] } : inc
-    ));
+  const handleVerify = async (id) => {
+    if (!user) {
+      toast.error('Connect your identity to verify incidents');
+      return;
+    }
+
+    const inc = incidents.find(i => i._id === id);
+    const isVerifying = !inc?.verifications?.includes(user.id);
+
+    try {
+      const res = await verifyIncident(id);
+      setIncidents(prev => prev.map(i => i._id === id ? res.data : i));
+      
+      if (isVerifying) {
+        toast.success('Incident Intelligence Verified', { icon: '🛡️' });
+      } else {
+        toast.success('Verification Removed', { icon: '🔄' });
+      }
+    } catch (err) {
+      toast.error(err.message || 'Verification Sync Failed');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Erase this record from the community network?')) return;
+    try {
+      await deleteIncident(id);
+      setIncidents(prev => prev.filter(i => i._id !== id));
+      toast.success('Record Erased');
+    } catch (err) {
+      toast.error(err.message || 'Erasure failed');
+    }
   };
 
   const handleFlag = (id) => {
@@ -157,8 +181,10 @@ const Dashboard = () => {
             <IncidentCard 
               key={inc._id} 
               incident={inc} 
+              user={user}
               onVerify={handleVerify}
               onFlag={handleFlag}
+              onDelete={handleDelete}
             />
           ))
         )}

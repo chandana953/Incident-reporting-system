@@ -67,3 +67,20 @@ export const getNearbyIncidents = async (lat, lng, distance = 5) => {
 export const getStats = async () => {
   return api.get('/incidents/stats/overview');
 };
+
+/**
+ * Verify an incident (Like)
+ * @param {String} id - Incident ID
+ */
+export const verifyIncident = async (id) => {
+  return api.post(`/incidents/${id}/verify`);
+};
+
+/**
+ * Add a comment to an incident
+ * @param {String} id - Incident ID
+ * @param {Object} commentData - { text }
+ */
+export const addComment = async (id, commentData) => {
+  return api.post(`/incidents/${id}/comments`, commentData);
+};

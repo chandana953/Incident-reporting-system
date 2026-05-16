@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getIncidentById, updateIncident, deleteIncident } from '../services/incidentService';
+import { getIncidentById, updateIncident, deleteIncident, verifyIncident, addComment } from '../services/incidentService';
 import { useAuth } from '../context/AuthContext';
 import { LoadingSpinner, ErrorBox, formatDate } from '../components/UI';
 import { 
@@ -33,6 +33,9 @@ const IncidentDetails = () => {
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     const fetchIncident = async () => {
@@ -78,6 +81,52 @@ const IncidentDetails = () => {
     }
   };
 
+  const handleVerify = async () => {
+    if (!user) {
+      toast.error('Authentication required to verify');
+      return;
+    }
+    
+    const isVerifying = !incident?.verifications?.includes(user.id);
+    setVerifying(true);
+    
+    try {
+      const res = await verifyIncident(id);
+      setIncident(res.data);
+      
+      if (isVerifying) {
+        toast.success('Incident Verified', { icon: '🛡️' });
+      } else {
+        toast.success('Verification Removed', { icon: '🔄' });
+      }
+    } catch (err) {
+      toast.error(err.message || 'Verification failed');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    if (!user) {
+      toast.error('Authentication required to comment');
+      return;
+    }
+    
+    setSubmittingComment(true);
+    try {
+      const res = await addComment(id, { text: commentText });
+      setIncident(res.data);
+      setCommentText('');
+      toast.success('Comment Broadcasted');
+    } catch (err) {
+      toast.error(err.message || 'Comment failed');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
   const canEdit = incident && (isAdmin || incident.reportedBy?._id === user?.id);
 
   if (loading) return <LoadingSpinner message="SYNCING WITH DATA NODE..." />;
@@ -104,7 +153,8 @@ const IncidentDetails = () => {
     createdAt,
     updatedAt,
     verifications = [],
-    assignedDepartments = []
+    assignedDepartments = [],
+    comments = []
   } = incident;
 
   return (
@@ -169,6 +219,27 @@ const IncidentDetails = () => {
                 </div>
               )}
 
+              {/* Interaction Bar */}
+              <div className="flex flex-wrap items-center gap-4 mb-8 py-4 border-y border-white/5">
+                <button 
+                  onClick={handleVerify} 
+                  disabled={verifying}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 ${
+                    verifications.includes(user?.id) 
+                    ? 'bg-success/20 text-success border border-success/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]' 
+                    : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 active:scale-95'
+                  }`}
+                >
+                  <ShieldCheck size={18} className={verifications.includes(user?.id) ? 'fill-success/20' : ''} />
+                  {verifications.includes(user?.id) ? 'Verified' : 'Verify Incident'}
+                  <span className="ml-2 px-2 py-0.5 bg-black/40 rounded-lg text-[10px]">{verifications.length}</span>
+                </button>
+
+                <button className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black text-xs uppercase tracking-widest transition-all active:scale-95">
+                  <Share2 size={18} /> Share Intel
+                </button>
+              </div>
+
               {/* Coordination Map (Mock) */}
               <div className="space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
@@ -203,6 +274,71 @@ const IncidentDetails = () => {
                   </svg>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Comments Section */}
+          <div className="glass-card p-8">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted mb-8 flex items-center gap-2">
+              <MessageCircle size={18} className="text-accent" /> Network Intelligence (Comments)
+            </h3>
+
+            {/* Comment Form */}
+            {user ? (
+              <form onSubmit={handleAddComment} className="mb-10">
+                <div className="relative group">
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Contribute intelligence to this record..."
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 min-h-[100px] text-sm focus:border-accent/50 focus:ring-1 focus:ring-accent/50 outline-none transition-all resize-none font-medium placeholder:text-muted/50"
+                  />
+                  <div className="absolute bottom-4 right-4 flex items-center gap-3">
+                    <span className={`text-[10px] font-bold ${commentText.length > 500 ? 'text-danger' : 'text-muted'}`}>
+                      {commentText.length}/500
+                    </span>
+                    <button
+                      type="submit"
+                      disabled={submittingComment || !commentText.trim()}
+                      className="bg-accent hover:bg-accent-hover disabled:bg-white/5 disabled:text-muted text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] active:scale-95"
+                    >
+                      {submittingComment ? 'Syncing...' : 'Broadcast'}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <div className="p-6 bg-white/5 border border-dashed border-white/10 rounded-2xl mb-10 text-center">
+                <p className="text-xs font-bold text-muted uppercase tracking-widest">
+                  Authentication required to contribute intelligence. <Link to="/login" className="text-accent hover:underline">Connect Identity</Link>
+                </p>
+              </div>
+            )}
+
+            {/* Comment List */}
+            <div className="space-y-6">
+              {comments.length > 0 ? (
+                comments.slice().reverse().map((comment, i) => (
+                  <div key={i} className="flex gap-4 group">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-accent/30 transition-colors">
+                      <User size={18} className="text-muted group-hover:text-accent transition-colors" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-black uppercase tracking-tighter text-white">{comment.username}</h4>
+                        <span className="text-[9px] font-bold text-muted/50 uppercase">{formatDate(comment.createdAt)}</span>
+                      </div>
+                      <p className="text-sm text-muted/90 font-medium leading-relaxed bg-white/[0.02] p-3 rounded-xl border border-white/[0.02]">
+                        {comment.text}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-10 text-center">
+                  <p className="text-xs font-bold text-muted/30 uppercase tracking-[0.3em]">No Intelligence Contributed Yet</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

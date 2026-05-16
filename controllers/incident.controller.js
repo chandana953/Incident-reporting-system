@@ -111,3 +111,13 @@ exports.flagIncident = async (req, res, next) => {
         return next(error);
     }
 };
+
+exports.addComment = async (req, res, next) => {
+    try {
+        const { text } = req.body;
+        const incident = await incidentService.addComment(req.params.id, req.user._id, text);
+        return sendResponse(res, 201, 'Comment added successfully', incident);
+    } catch (error) {
+        return next(error);
+    }
+};

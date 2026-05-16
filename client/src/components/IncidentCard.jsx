@@ -11,11 +11,15 @@ import {
   AlertTriangle,
   MoreHorizontal,
   User,
-  Heart
+  Heart,
+  Trash2,
+  Activity
 } from 'lucide-react';
 import { formatDate } from './UI';
 
-const IncidentCard = ({ incident, onVerify, onFlag }) => {
+const IncidentCard = ({ incident, user, onVerify, onFlag, onDelete }) => {
+  const isAdmin = user?.role === 'admin';
+  const isOwner = user?.id === incident.reportedBy?._id || user?.id === incident.reportedBy;
   const {
     _id,
     title,
@@ -30,7 +34,8 @@ const IncidentCard = ({ incident, onVerify, onFlag }) => {
     verificationStatus,
     assignedDepartments = [],
     verifications = [],
-    flags = []
+    flags = [],
+    comments = []
   } = incident;
 
   const severityColor = {
@@ -126,10 +131,10 @@ const IncidentCard = ({ incident, onVerify, onFlag }) => {
         <div className="flex items-center gap-6">
           <button 
             onClick={() => onVerify?.(_id)}
-            className="flex items-center gap-2 text-muted hover:text-success transition-colors group/btn"
+            className={`flex items-center gap-2 transition-colors group/btn ${verifications.includes(user?.id) ? 'text-success' : 'text-muted hover:text-success'}`}
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover/btn:bg-success/10 transition-colors">
-              <CheckCircle2 size={18} />
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${verifications.includes(user?.id) ? 'bg-success/10' : 'group-hover/btn:bg-success/10'}`}>
+              <CheckCircle2 size={18} className={verifications.includes(user?.id) ? 'fill-success/20' : ''} />
             </div>
             <span className="text-xs font-bold">{verifications.length || 'Verify'}</span>
           </button>
@@ -138,7 +143,7 @@ const IncidentCard = ({ incident, onVerify, onFlag }) => {
             <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover/btn:bg-accent/10 transition-colors">
               <MessageCircle size={18} />
             </div>
-            <span className="text-xs font-bold">12</span>
+            <span className="text-xs font-bold">{comments.length}</span>
           </button>
 
           <button className="flex items-center gap-2 text-muted hover:text-secondary transition-colors group/btn">
@@ -148,12 +153,24 @@ const IncidentCard = ({ incident, onVerify, onFlag }) => {
           </button>
         </div>
 
-        <button 
-          onClick={() => onFlag?.(_id)}
-          className="text-muted hover:text-danger transition-colors p-2"
-        >
-          <Flag size={18} />
-        </button>
+        <div className="flex items-center gap-1">
+          {(isAdmin || isOwner) && (
+            <button 
+              onClick={() => onDelete?.(_id)}
+              className="text-muted hover:text-danger transition-colors p-2"
+              title="Delete Record"
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
+          <button 
+            onClick={() => onFlag?.(_id)}
+            className="text-muted hover:text-danger transition-colors p-2"
+            title="Flag Intelligence"
+          >
+            <Flag size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Smart Routing Panel */}

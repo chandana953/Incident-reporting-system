@@ -62,5 +62,8 @@ router.delete('/:id', incidentController.deleteIncident);
 // Verification & Flagging
 router.post('/:id/verify', incidentController.verifyIncident);
 router.post('/:id/flag', incidentController.flagIncident);
+router.post('/:id/comments', [
+    body('text', 'Comment text is required').not().isEmpty()
+], validate, incidentController.addComment);
 
 module.exports = router;

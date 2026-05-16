@@ -1,4 +1,5 @@
 const Incident = require('../models/Incident');
+const User = require('../models/User');
 const CustomError = require('../utils/customError');
 const { getIO } = require('../config/socket');
 const { getSmartRouting } = require('./routingService');
@@ -302,19 +303,31 @@ const verifyIncident = async (id, userId) => {
     if (process.env.DB_CONNECTED === 'true') {
         incident = await Incident.findById(id);
         if (!incident) throw new CustomError('Incident not found', 404);
+
+        const alreadyVerifiedIdx = incident.verifications.findIndex(vid => vid && vid.toString() === userId.toString());
         
-        // Add user to verifications if not already there
-        if (!incident.verifications.includes(userId)) {
+        if (alreadyVerifiedIdx === -1) {
             incident.verifications.push(userId);
-            await incident.save();
+        } else {
+            incident.verifications.splice(alreadyVerifiedIdx, 1);
         }
+        
+        await incident.save();
+        
+        // Re-fetch with population to ensure clean document
+        return await Incident.findById(id)
+            .populate('reportedBy', 'name email')
+            .populate('assignedTo', 'name email');
     } else {
         // RESILIENT MODE
         const idx = memoryIncidents.findIndex(inc => inc._id === id);
         if (idx === -1) throw new CustomError('Incident not found', 404);
         
-        if (!memoryIncidents[idx].verifications.includes(userId)) {
+        const vIdx = memoryIncidents[idx].verifications.indexOf(userId);
+        if (vIdx === -1) {
             memoryIncidents[idx].verifications.push(userId);
+        } else {
+            memoryIncidents[idx].verifications.splice(vIdx, 1);
         }
         incident = memoryIncidents[idx];
     }
@@ -325,9 +338,53 @@ const verifyIncident = async (id, userId) => {
  * Flag an incident
  */
 const flagIncident = async (id, userId) => {
-    // In this premium version, flagging could trigger an admin review task
-    // For now, we'll just track it
     return { success: true, message: 'Incident flagged for review' };
+};
+
+/**
+ * Add a comment to an incident
+ */
+const addComment = async (id, userId, text) => {
+    let incident;
+    if (process.env.DB_CONNECTED === 'true') {
+        // We need the user's name for the comment
+        const user = await User.findById(userId);
+        if (!user) throw new CustomError('User not found', 404);
+
+        incident = await Incident.findById(id);
+        if (!incident) throw new CustomError('Incident not found', 404);
+
+        // Ensure comments array exists
+        if (!incident.comments) incident.comments = [];
+
+        incident.comments.push({
+            user: userId,
+            username: user.name,
+            text,
+            createdAt: new Date()
+        });
+
+        await incident.save();
+        
+        // Re-fetch with population
+        return await Incident.findById(id)
+            .populate('reportedBy', 'name email')
+            .populate('assignedTo', 'name email');
+    } else {
+        // RESILIENT MODE
+        const idx = memoryIncidents.findIndex(inc => inc._id === id);
+        if (idx === -1) throw new CustomError('Incident not found', 404);
+        
+        memoryIncidents[idx].comments = memoryIncidents[idx].comments || [];
+        memoryIncidents[idx].comments.push({
+            user: userId,
+            username: 'Active Node User',
+            text,
+            createdAt: new Date()
+        });
+        incident = memoryIncidents[idx];
+    }
+    return incident;
 };
 
 module.exports = {
@@ -339,5 +396,6 @@ module.exports = {
     getNearbyIncidents,
     getStats,
     verifyIncident,
-    flagIncident
+    flagIncident,
+    addComment
 };
